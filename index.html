@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>던전 포지 한글판 · 절차적 던전 생성과 탐험</title>
+<link rel="icon" href="data:," />
+<style>
+  @font-face { font-family: 'NotoKR'; font-weight: 400 500; src: url(./src/fonts/NotoSansKR-400-subset.woff2) format('woff2'); }
+  @font-face { font-family: 'NotoKR'; font-weight: 600 700; src: url(./src/fonts/NotoSansKR-700-subset.woff2) format('woff2'); }
+  :root { --accent: #e8973f; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #07080d; }
+  #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; cursor: grab; }
+  #view.drag { cursor: grabbing; }
+  .locked #view { cursor: none; }
+  #cover { position: fixed; inset: 0; background: #07080d; pointer-events: none; }
+  #cover.off { display: none; }
+  .hud { position: fixed; pointer-events: none; font: 500 11px/1.35 'NotoKR', ui-monospace, 'Cascadia Mono', Consolas, 'Malgun Gothic', 'Apple SD Gothic Neo', monospace; color: rgba(255, 255, 255, 0.84); text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75); visibility: hidden; }
+  .hud.on { visibility: visible; }
+
+  #title { left: 14px; top: 11px; }
+  #name { font: 600 15px/1.25 ui-serif, Georgia, 'Times New Roman', 'Apple SD Gothic Neo', 'NotoKR', 'Malgun Gothic', serif; color: #fff; letter-spacing: 0.01em; }
+  #facts { margin-top: 2px; color: rgba(255, 255, 255, 0.66); }
+  #credit { right: 12px; top: 10px; color: rgba(255, 255, 255, 0.5); }
+
+  #legend { left: 14px; bottom: 10px; display: flex; flex-wrap: wrap; gap: 3px 10px; max-width: 46%; }
+  #legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; }
+
+  #go { left: 50%; bottom: 44px; transform: translateX(-50%); padding: 7px 14px; border-radius: 8px; background: rgba(8, 9, 12, 0.66); border: 1px solid rgba(255, 255, 255, 0.16); font-size: 13px; color: #fff; white-space: nowrap; }
+  #go kbd, #keys kbd { font: inherit; min-width: 9px; padding: 1px 5px; text-align: center; border-radius: 4px; color: #fff; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.28); text-shadow: none; }
+  #go .asleep { display: none; }
+  body:not(.awake) #go .asleep { display: inline; }
+  body:not(.awake) #go .wake { display: none; }
+
+  #keys { right: 12px; bottom: 8px; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  #keys kbd.down { background: #fff; color: #10131a; }
+  #keys .gap { width: 7px; }
+  #keys .walk { display: none; }
+  .walking #keys .walk { display: inline; }
+  .walking #keys .map { display: none; }
+  #keys .touch { display: none; }
+  @media (pointer: coarse) { #keys > :not(.touch) { display: none !important; } #keys .touch { display: inline; } #go .wake, #go .asleep { display: none !important; } }
+
+  #place { left: 50%; top: 14px; transform: translateX(-50%); font: 600 15px/1.2 ui-serif, Georgia, 'Times New Roman', 'Apple SD Gothic Neo', 'NotoKR', 'Malgun Gothic', serif; color: var(--role, #fff); opacity: 0; transition: opacity 0.3s; }
+  #mini { right: 12px; top: 12px; width: 132px; height: 132px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.2); opacity: 0; transition: opacity 0.3s; }
+  .walking #place, .walking #mini { opacity: 1; }
+  .walking #credit, .walking #title, .walking #legend, .walking #go { display: none; }
+  #cross { left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); display: none; }
+  .walking.locked #cross { display: block; }
+  #grab { left: 50%; top: 60%; transform: translateX(-50%); padding: 6px 12px; border-radius: 8px; background: rgba(8, 9, 12, 0.6); font-size: 12px; display: none; white-space: nowrap; }
+  .walking:not(.locked) #grab { display: block; }
+  @media (pointer: coarse) { #grab { display: none !important; } }
+
+
+  #panel { position: fixed; left: 12px; top: 90px; width: 262px; max-height: calc(100% - 180px); overflow: auto; box-sizing: border-box; padding: 10px 12px 12px; border-radius: 10px; background: rgba(8, 9, 12, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); color: #e9e9ee; font: 500 12px/1.4 'NotoKR', system-ui, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; backdrop-filter: blur(6px); }
+  #panel h2 { margin: 0 0 6px; font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; }
+  #panel .row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+  #panel label { flex: 0 0 86px; color: rgba(255, 255, 255, 0.82); }
+  #panel input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent); }
+  #panel output { flex: 0 0 38px; text-align: right; font: 500 11px ui-monospace, Consolas, monospace; color: rgba(255, 255, 255, 0.7); }
+  #panel select, #panel input[type=number] { flex: 1; min-width: 0; background: #151821; color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 3px 6px; font: inherit; }
+  #panel .tg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; margin: 4px 0; }
+  #panel .tg label { flex: none; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  #panel .btns { display: flex; gap: 6px; margin: 8px 0 4px; }
+  #panel button { flex: 1; padding: 6px 4px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(255, 255, 255, 0.08); color: #fff; font: inherit; cursor: pointer; }
+  #panel button:hover { background: rgba(255, 255, 255, 0.18); }
+  #panel button.go { background: var(--accent); color: #10131a; border-color: transparent; font-weight: 700; }
+  #panel hr { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.12); margin: 8px 0; }
+  #panel .note { color: rgba(255, 255, 255, 0.55); font-size: 11px; margin-top: 2px; }
+  #stats { font: 500 11px/1.5 'NotoKR', ui-monospace, Consolas, 'Malgun Gothic', monospace; color: rgba(255, 255, 255, 0.72); white-space: pre; }
+  #ptoggle { position: fixed; left: 12px; top: 56px; z-index: 3; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.22); background: rgba(8, 9, 12, 0.72); color: #fff; font: 600 12px 'NotoKR', system-ui, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; cursor: pointer; }
+  .walking #panel, .walking #ptoggle { display: none; }
+  #panel.shut { display: none; }
+  @media (max-width: 720px) { #panel { width: 230px; } #legend { max-width: 90%; bottom: 40px; } }
+
+  #nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 24px; background: #101218; color: #e4e4e7; font: 400 14px/1.5 'NotoKR', system-ui, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; }
+  #nogl.on { display: flex; }
+  #nogl .card { max-width: 420px; padding: 22px 24px; border-radius: 12px; background: rgba(9, 9, 11, 0.62); border: 1px solid rgba(255, 255, 255, 0.1); }
+  #nogl h1 { margin: 0 0 8px; font: 600 17px/1.3 system-ui, sans-serif; color: #fafafa; }
+  #nogl small { display: block; color: #a1a1aa; font: 500 11px/1.4 ui-monospace, monospace; }
+</style>
+</head>
+<body>
+<canvas id="view" tabindex="0"></canvas>
+<div id="cover"></div>
+<div id="title" class="hud"><div id="name"></div><div id="facts"></div></div>
+<div id="credit" class="hud">Dungeon Forge by Majid Manzarpour (MIT) · Patch 확장 · 한글판</div>
+<div id="legend" class="hud">
+  <span><i style="background:#3fd0bb"></i>입구</span>
+  <span><i style="background:#8f95a3"></i>전투</span>
+  <span><i style="background:#9b6cf0"></i>정예</span>
+  <span><i style="background:#d9a441"></i>보물</span>
+  <span><i style="background:#5a8fe8"></i>성소</span>
+  <span><i style="background:#d8433a"></i>보스</span>
+</div>
+<div id="go" class="hud"><span class="wake"><kbd>Enter</kbd> 키로 걸어 보기</span><span class="asleep">화면을 클릭한 뒤 <kbd>Enter</kbd> 키로 걸어 보기</span></div>
+<div id="keys" class="hud">
+  <span class="map"><kbd>Enter</kbd> 걸어 보기</span><span class="gap map"></span>
+  <span class="map">드래그: 이동 · 우클릭 드래그: 회전 · 휠: 확대/축소</span>
+  <span class="walk"><kbd data-key="KeyW">W</kbd><kbd data-key="KeyA">A</kbd><kbd data-key="KeyS">S</kbd><kbd data-key="KeyD">D</kbd> 걷기</span><span class="gap walk"></span>
+  <span class="walk"><kbd data-key="ShiftLeft">Shift</kbd> 달리기</span><span class="gap walk"></span>
+  <span class="walk">마우스: 시점 · 휠: 시야각</span><span class="gap walk"></span>
+  <span class="walk"><kbd>Enter</kbd> 지도로 돌아가기</span>
+  <span class="touch">드래그로 시점 이동, 길게 눌러 걷기</span>
+</div>
+<button id="ptoggle" type="button">설정 패널</button>
+<div id="panel"></div>
+<div id="place" class="hud"></div>
+<canvas id="mini" class="hud" width="264" height="264"></canvas>
+<div id="cross" class="hud"></div>
+<div id="grab" class="hud">클릭하면 주변을 둘러볼 수 있습니다</div>
+<div id="nogl"><div class="card"><h1></h1><small></small></div></div>
+<script type="module" src="./src/demo.js"></script>
+</body>
+</html>

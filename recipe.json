@@ -1,0 +1,225 @@
+{
+	"mode": "browser",
+	"block": {
+		"controls": [
+			{
+				"id": "theme",
+				"label": "테마",
+				"hint": "돌, 빛, 액체, 장식의 분위기입니다. 평면 구조는 그대로라서 마음에 드는 던전을 다른 테마로 바꿔 볼 수 있습니다.",
+				"type": "choice",
+				"options": [
+					{
+						"value": "ancient",
+						"label": "고대",
+						"image": "thumbs/themes/ancient.webp"
+					},
+					{
+						"value": "molten",
+						"label": "용암",
+						"image": "thumbs/themes/molten.webp"
+					},
+					{
+						"value": "frost",
+						"label": "서리",
+						"image": "thumbs/themes/frost.webp"
+					},
+					{
+						"value": "grim",
+						"label": "음산",
+						"image": "thumbs/themes/grim.webp"
+					},
+					{
+						"value": "verdant",
+						"label": "녹음",
+						"image": "thumbs/themes/verdant.webp"
+					}
+				],
+				"default": "molten",
+				"essential": true
+			},
+			{
+				"id": "rooms",
+				"label": "방 개수",
+				"hint": "만들 방의 수입니다.",
+				"type": "number",
+				"min": 8,
+				"max": 60,
+				"step": 1,
+				"default": 24,
+				"essential": true
+			},
+			{
+				"id": "loops",
+				"label": "순환 비율",
+				"hint": "방에 두 번째 입구가 생기는 정도입니다. 낮으면 막다른 길이 많고, 높으면 지름길과 순환로가 많아집니다.",
+				"type": "number",
+				"min": 0,
+				"max": 100,
+				"step": 1,
+				"default": 30,
+				"unit": "%",
+				"essential": true
+			},
+			{
+				"id": "seed",
+				"label": "시드",
+				"hint": "시드, 방 개수, 순환 비율이 같으면 항상 같은 평면이 나옵니다.",
+				"type": "number",
+				"min": 0,
+				"max": 999999,
+				"step": 1,
+				"default": 1337
+			},
+			{
+				"id": "decor",
+				"label": "잔해",
+				"hint": "바닥에 흩어진 돌조각, 이끼, 뼈의 양입니다.",
+				"type": "number",
+				"min": 0,
+				"max": 100,
+				"step": 1,
+				"default": 60,
+				"unit": "%"
+			},
+			{
+				"id": "view",
+				"label": "시점",
+				"hint": "위에서 내려다보거나 눈높이로 걸어 다닙니다.",
+				"type": "choice",
+				"options": [
+					{
+						"value": "map",
+						"label": "지도"
+					},
+					{
+						"value": "walk",
+						"label": "걷기"
+					}
+				],
+				"default": "map"
+			},
+			{
+				"id": "graph",
+				"label": "방 연결선",
+				"hint": "지도 위에 방 연결 그래프를 그립니다. 최단 경로는 빨강, 순환로는 파랑입니다.",
+				"type": "toggle",
+				"default": false
+			},
+			{
+				"id": "light",
+				"label": "횃불 밝기",
+				"hint": "던전의 모든 등불이 타오르는 밝기입니다.",
+				"type": "number",
+				"min": 0.2,
+				"max": 2.5,
+				"step": 0.05,
+				"default": 1,
+				"unit": "×"
+			},
+			{
+				"id": "bloom",
+				"label": "블룸",
+				"hint": "불꽃과 용암 주변의 번짐 효과입니다.",
+				"type": "number",
+				"min": 0,
+				"max": 2,
+				"step": 0.05,
+				"default": 0.9
+			},
+			{
+				"id": "tilt",
+				"label": "미니어처 초점",
+				"hint": "지도 위아래를 흐리게 해 모형 사진처럼 보이게 합니다. 걸을 때는 쓰지 않습니다.",
+				"type": "number",
+				"min": 0,
+				"max": 1,
+				"step": 0.05,
+				"default": 1
+			},
+			{
+				"id": "heat",
+				"label": "난이도 히트맵",
+				"hint": "방 바닥을 난이도에 따라 초록(쉬움)에서 빨강(어려움)으로 칠합니다. 입구에서 멀수록 어렵습니다.",
+				"type": "toggle",
+				"default": false
+			},
+			{
+				"id": "props",
+				"label": "소품",
+				"hint": "상자, 묘비, 잔해, 이끼, 배너 같은 장식물을 켜고 끕니다.",
+				"type": "toggle",
+				"default": true
+			},
+			{
+				"id": "torches",
+				"label": "횃불",
+				"hint": "벽 횃불과 불꽃을 켜고 끕니다.",
+				"type": "toggle",
+				"default": true
+			},
+			{
+				"id": "particles",
+				"label": "입자",
+				"hint": "불씨, 눈, 포자 같은 떠다니는 입자를 켜고 끕니다.",
+				"type": "toggle",
+				"default": true
+			},
+			{
+				"id": "liquids",
+				"label": "액체",
+				"hint": "용암, 물, 독기 웅덩이를 켜고 끕니다.",
+				"type": "toggle",
+				"default": true
+			},
+			{
+				"id": "lights",
+				"label": "조명",
+				"hint": "구운 조명을 켜고 끕니다. 끄면 어둡게 보입니다.",
+				"type": "toggle",
+				"default": true
+			}
+		],
+		"presets": [],
+		"triggers": [
+			{
+				"id": "new",
+				"label": "새 던전",
+				"hint": "같은 설정으로 새 시드를 뽑아 다시 만듭니다."
+			},
+			{
+				"id": "walk",
+				"label": "걸어 보기",
+				"hint": "아래로 내려가 1인칭으로 걷거나 지도로 돌아옵니다. Enter 키도 같습니다."
+			},
+			{
+				"id": "reset",
+				"label": "초기화",
+				"hint": "모든 설정을 기본값으로 되돌립니다."
+			}
+		]
+	},
+	"credits": [
+		{
+			"files": "assets/",
+			"license": "MIT",
+			"source": "https://github.com/majidmanzarpour/threejs-procedural-dungeon",
+			"author": "Majid Manzarpour (Dungeon Forge, commit 0a2aa09): the generator, room roles, themes, geometry kit, liquids, particles and post-processing"
+		},
+		{
+			"files": "assets/",
+			"license": "MIT",
+			"source": "https://github.com/mrdoob/three.js",
+			"author": "three.js authors"
+		},
+		{
+			"files": "assets/",
+			"license": "MIT",
+			"author": "Patch: the walk, ceilings, stone, flames, light field and corridor routing"
+		},
+		{
+			"files": "thumbs/",
+			"license": "MIT",
+			"author": "Patch (stills of this demo)"
+		}
+	]
+}

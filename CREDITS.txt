@@ -1,0 +1,12 @@
+Dungeons (a block demo on Patch)
+
+Dungeon Forge by Majid Manzarpour, MIT, (c) 2026 Majid Manzarpour.
+  https://github.com/majidmanzarpour/threejs-procedural-dungeon (commit 0a2aa09)
+  The generator, room roles, five themes, geometry kit, liquids, particles and post-processing.
+  Licence: licenses/LICENSE-dungeon-forge.txt
+three.js: MIT, the three.js authors. https://github.com/mrdoob/three.js
+Patch, MIT: splitting generator from view, corridor routing, the walk, ceilings, cut corners, stone, flames and the light field.
+Everything you see is made in code: no textures, models or sounds.
+
+Korean edition (한글판): UI/theme/room-name translation, settings panel, difficulty heat map, layer toggles and generation stats added on top of the Patch demo. MIT, same as the sources above.
+Noto Sans KR (subset of Hangul glyphs): SIL Open Font License 1.1, Google. See licenses/LICENSE-noto-sans-kr.txt.
