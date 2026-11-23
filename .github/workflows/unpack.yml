@@ -1,0 +1,23 @@
+name: unpack-upload
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack uploaded zip into the repo root
+        run: |
+          z=$(ls *.zip 2>/dev/null | head -1 || true)
+          if [ -z "$z" ]; then echo "no zip"; exit 0; fi
+          unzip -oq "$z"
+          rm -f ./*.zip
+          git config user.name "github-actions"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Add Korean edition project files" || exit 0
+          git push
